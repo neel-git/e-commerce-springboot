@@ -1,4 +1,4 @@
-package com.scaler.demoproject.configs;
+package com.scaler.demoproject.services;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
