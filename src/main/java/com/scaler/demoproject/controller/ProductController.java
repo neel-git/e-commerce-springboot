@@ -1,6 +1,7 @@
 package com.scaler.demoproject.controller;
 
 import com.scaler.demoproject.dto.ErrorDto;
+import com.scaler.demoproject.exceptions.ExternalApiException;
 import com.scaler.demoproject.exceptions.ProductNotFoundException;
 import com.scaler.demoproject.model.Category;
 import com.scaler.demoproject.model.Product;
@@ -19,14 +20,14 @@ public class ProductController {
     private ProductService productService;
 
 
-    public ProductController(@Qualifier("selfProductService") ProductService productService){
+    public ProductController(@Qualifier("fakeStoreProductService") ProductService productService){
         this.productService = productService;
     }
     //POST /product
     @PostMapping("/products")
-    public Product createProduct(@RequestBody Product product) {
+    public ResponseEntity<Product> createProduct(@RequestBody Product product) {
         Product postRequestResponse = productService.createProduct(product);
-        return postRequestResponse;
+        return new ResponseEntity<>(postRequestResponse,HttpStatus.CREATED);
     }
 
     @GetMapping("/products/{id}")
@@ -40,7 +41,7 @@ public class ProductController {
     }
 
     @GetMapping("/products")
-    public ResponseEntity<List<Product>> getAllProduct(){
+    public ResponseEntity<List<Product>> getAllProduct() throws ExternalApiException {
         List<Product> products = productService.getAllProducts();
         ResponseEntity<List<Product>> response = new ResponseEntity<>(products,HttpStatus.OK);
 
@@ -59,16 +60,9 @@ public class ProductController {
     }
 
     @DeleteMapping("/products/{id}")
-    public ResponseEntity<String> deleteSingleProduct(@PathVariable("id") Long productId) {
+    public ResponseEntity<String> deleteSingleProduct(@PathVariable("id") Long productId) throws ProductNotFoundException {
         productService.deleteSingleProduct(productId);
         return new ResponseEntity<>("Product with ID " + productId + " deleted successfully.", HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler(ProductNotFoundException.class)
-    public ResponseEntity<ErrorDto> handleProductNotFoundException(Exception e){
-        ErrorDto errorDto = new ErrorDto();
-        errorDto.setMessage(e.getMessage());
-
-        return new ResponseEntity<>(errorDto,HttpStatus.NOT_FOUND);
-    }
 }

@@ -31,7 +31,7 @@ public class SelfProductService implements ProductService{
 
     @Override
     public List<Product> getAllProducts() {
-        return null;
+        return productRepository.findAll();
     }
 
     @Override
@@ -52,28 +52,32 @@ public class SelfProductService implements ProductService{
 
     @Override
     public List<Category> getAllCategories() {
-        return null;
+        return categoryRepository.findAll();
     }
 
     @Override
-    public Product updateSingleProduct(Long productId, Product product) throws ProductNotFoundException {
-       Optional<Product> p = productRepository.findById(productId);
-       if(p.isEmpty()){
+    public Product updateSingleProduct(Long productId, Product updateProduct) throws ProductNotFoundException {
+       Optional<Product> optionalProduct = productRepository.findById(productId);
+       if(optionalProduct.isEmpty()){
            throw new ProductNotFoundException("Product not Found");
        }
-       Product currProduct = p.get();
-       currProduct.setId(product.getId());
-       currProduct.setPrice(product.getPrice());
-       currProduct.setImageUrl(product.getImageUrl());
-       currProduct.setDescription(product.getDescription());
-       currProduct.setCategory(product.getCategory());
-      // productRepository.updateById(productId,currProduct);
+       Product currProduct = optionalProduct.get();
+       currProduct.setTitle(updateProduct.getTitle());
+       currProduct.setPrice(updateProduct.getPrice());
+       currProduct.setImageUrl(updateProduct.getImageUrl());
+       currProduct.setDescription(updateProduct.getDescription());
+       currProduct.setCategory(updateProduct.getCategory());
+       productRepository.save(currProduct);
 
        return currProduct;
     }
 
     @Override
-    public void deleteSingleProduct(Long productId) {
-        productRepository.deleteById(productId);
+    public void deleteSingleProduct(Long productId) throws ProductNotFoundException {
+       if(productRepository.existsById(productId)) {
+           productRepository.deleteById(productId);
+       } else {
+           throw new ProductNotFoundException("Product with id "+ productId+ " not found");
+       }
     }
 }

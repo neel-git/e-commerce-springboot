@@ -6,15 +6,14 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ProductRepository extends JpaRepository<Product,Long> {
     Product save(Product product);
     Product findByTitle(String title);
     Product findByDescription(String description);
-    List<Product> getProductById(Long id);
 
-    void deleteById(Long id);
-    // Product updateById(Long id, Product product);
+
 
     // HQL
     @Query("select p from Product p where p.category.id = :categoryId")
